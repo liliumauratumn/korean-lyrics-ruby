@@ -426,7 +426,16 @@ export default function KoreanLyricsRuby() {
       localStorage.setItem('koreanLyrics', JSON.stringify(updated));
     }
   };
-
+const handleExportSingle = (lyric: any) => {
+    const safeTitle = lyric.title.replace(/[/:*?"<>|]/g, '-');
+    const dataStr = JSON.stringify([lyric], null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${safeTitle}.json`;
+    link.click();
+  };
   const handleExport = () => {
     const dataStr = JSON.stringify(savedLyrics, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -845,28 +854,24 @@ export default function KoreanLyricsRuby() {
             <p className="text-gray-500 text-center py-8">保存された歌詞はありません</p>
           ) : (
             <div className="space-y-2">
-              {savedLyrics.map((lyric) => (
-                <div
-                  key={lyric.id}
-                  className="flex justify-between items-center p-3 bg-gray-50 rounded-md hover:bg-gray-100"
-                >
-                  <div
-                    className="flex-1 cursor-pointer"
-                    onClick={() => handleLoad(lyric)}
-                  >
-                    <h3 className="font-medium text-gray-800">{lyric.title}</h3>
-                    <p className="text-xs text-gray-500">
-                      {new Date(lyric.date).toLocaleDateString('ja-JP')}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleDelete(lyric.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-md"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ))}
+          {savedLyrics.map((lyric) => (
+  <div key={lyric.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md hover:bg-gray-100">
+    <div className="flex-1 cursor-pointer" onClick={() => handleLoad(lyric)}>
+      <h3 className="font-medium text-gray-800">{lyric.title}</h3>
+      <p className="text-xs text-gray-500">
+        {new Date(lyric.date).toLocaleDateString('ja-JP')}
+      </p>
+    </div>
+    <div className="flex gap-2">
+      <button onClick={() => handleExportSingle(lyric)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-md" title="この曲をエクスポート">
+        <Download size={16} />
+      </button>
+      <button onClick={() => handleDelete(lyric.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-md">
+        <Trash2 size={16} />
+      </button>
+    </div>
+  </div>
+))}
             </div>
           )}
         </div>
