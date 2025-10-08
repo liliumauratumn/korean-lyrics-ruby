@@ -1,39 +1,12 @@
 // ファイルパス: lib/indexedDB.ts
-// 説明: IndexedDB操作（型安全版）
+// 説明: IndexedDB操作（型定義を削除、page.tsxからimport）
+
+import type { SavedLyric, ConvertedChar } from '@/app/page';
 
 const DB_NAME = 'KoreanLyricsDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'lyrics';
 const LOCALSTORAGE_KEY = 'koreanLyrics';
-
-export interface SavedLyric {
-  id: number;
-  title: string;
-  input: string;
-  converted: ConvertedChar[]; // ⭐ any → ConvertedChar[]
-  date: string;
-}
-
-// ⭐ ConvertedChar型を追加
-export interface ConvertedChar {
-  original: string;
-  ruby?: string;
-  mainSound?: string;
-  batchimSound?: string;
-  hasBatchim?: boolean;
-  highlighted?: boolean;
-  decomposed?: {
-    cho: string;
-    jung: string;
-    jong: string;
-  };
-  isNewline?: boolean;
-  isSpace?: boolean;
-  isCustomEdited?: boolean;
-  cho?: string;   // ⭐ 追加
-  jung?: string;  // ⭐ 追加
-  jong?: string;  // ⭐ 追加
-}
 
 // IndexedDBが使えるかチェック
 function isIndexedDBAvailable(): boolean {
@@ -51,7 +24,7 @@ export function initDB(): Promise<IDBDatabase | null> {
     return Promise.resolve(null);
   }
 
-  return new Promise((resolve) => { // ⭐ reject削除
+  return new Promise((resolve) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = () => {
@@ -79,7 +52,7 @@ export async function getAllLyrics(): Promise<SavedLyric[]> {
     return data ? JSON.parse(data) : [];
   }
 
-  return new Promise((resolve) => { // ⭐ reject削除
+  return new Promise((resolve) => {
     const transaction = db.transaction(STORE_NAME, 'readonly');
     const store = transaction.objectStore(STORE_NAME);
     const request = store.getAll();
@@ -153,7 +126,7 @@ export async function migrateFromLocalStorage(): Promise<void> {
     }
     localStorage.removeItem(LOCALSTORAGE_KEY);
     console.log('✅ LocalStorage → IndexedDB 移行完了');
-  } catch (err) { // ⭐ error → err
+  } catch (err) {
     console.error('❌ 移行エラー:', err);
   }
 }
