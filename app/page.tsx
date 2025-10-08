@@ -358,7 +358,7 @@ function applyPronunciationRules(chars: ConvertedChar[]): ConvertedChar[] {
       ruby: mainSound + batchimSound,
       mainSound: mainSound,
       batchimSound: batchimSound,
-   hasBatchim: Boolean(hasBatchim && batchimSound),
+      hasBatchim: Boolean(hasBatchim && batchimSound),
       highlighted: false,
       decomposed: { cho, jung: jung || '', jong: jong || '' }
     });
@@ -408,12 +408,26 @@ export default function KoreanLyricsRuby() {
   const [editMain, setEditMain] = useState('');
   const [editBatchim, setEditBatchim] = useState('');
   const [touchTimer, setTouchTimer] = useState<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+const [showScrollTop, setShowScrollTop] = useState(false);
+ useEffect(() => {
     const saved = localStorage.getItem('koreanLyrics');
     if (saved) {
       setSavedLyrics(JSON.parse(saved));
     }
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+      const windowHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercentage = (scrolled / windowHeight) * 100;
+      
+      setShowScrollTop(scrollPercentage > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleConvert = () => {
@@ -422,7 +436,7 @@ export default function KoreanLyricsRuby() {
   };
 
   const handleSave = () => {
-    const title = prompt('タイトルを入力してください(例:Spring Day - BTS)');
+    const title = prompt('タイトルを入力してください（例：Spring Day - BTS）');
     if (!title || !title.trim()) {
       return;
     }
@@ -438,7 +452,7 @@ export default function KoreanLyricsRuby() {
     const updated = [...savedLyrics, newLyric];
     setSavedLyrics(updated);
     localStorage.setItem('koreanLyrics', JSON.stringify(updated));
-    alert('保存しました!');
+    alert('保存しました！');
   };
 
   const handleLoad = (lyric: SavedLyric) => {
@@ -447,7 +461,7 @@ export default function KoreanLyricsRuby() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('削除しますか?')) {
+    if (confirm('削除しますか？')) {
       const updated = savedLyrics.filter(l => l.id !== id);
       setSavedLyrics(updated);
       localStorage.setItem('koreanLyrics', JSON.stringify(updated));
@@ -484,7 +498,7 @@ export default function KoreanLyricsRuby() {
           const imported = JSON.parse(event.target?.result as string);
           setSavedLyrics(imported);
           localStorage.setItem('koreanLyrics', JSON.stringify(imported));
-          alert('インポートしました!');
+          alert('インポートしました！');
         } catch {
           alert('ファイルの読み込みに失敗しました');
         }
@@ -611,68 +625,86 @@ export default function KoreanLyricsRuby() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-center mb-2 text-purple-800">
-          韓国語歌詞ルビアプリ v10.0
+          韓国語歌詞ルビアプリ v10.3
         </h1>
         <p className="text-center text-gray-600 mb-2 text-sm">
           ハングルにカタカナ/ひらがなのルビを自動で付けます
         </p>
         <p className="text-center text-purple-600 mb-4 text-xs font-medium">
-          🚀 Next.js版(면→ミョン、겼어→キョッソ、좋아→チョア)
+          📱 iPhone UI改善版
         </p>
 
-        <div className="bg-white rounded-lg shadow-md p-4 mb-4 sticky top-0 z-50">
-          <div className="flex flex-wrap gap-6 items-center">
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  checked={!useHiragana}
-                  onChange={() => setUseHiragana(false)}
-                  className="w-4 h-4"
-                />
-                <span>カタカナ</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  checked={useHiragana}
-                  onChange={() => setUseHiragana(true)}
-                  className="w-4 h-4"
-                />
-                <span>ひらがな</span>
-              </label>
+     <div className="bg-white rounded-lg shadow-md sticky top-0 z-50 mb-4">
+          {/* 設定ボタン */}
+          <button
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            className="w-full p-3 flex items-center justify-between hover:bg-gray-50"
+          >
+            <span className="flex items-center gap-2 font-medium text-gray-700">
+              ⚙️ 設定
+            </span>
+            <span className="text-gray-500">
+              {isSettingsOpen ? '▲' : '▼'}
+            </span>
+          </button>
+
+          {/* 設定パネル（開閉） */}
+          {isSettingsOpen && (
+            <div className="border-t p-4 space-y-4">
+              {/* カタカナ/ひらがな */}
+              <div className="flex gap-6">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={!useHiragana}
+                    onChange={() => setUseHiragana(false)}
+                    className="w-5 h-5"
+                  />
+                  <span className="text-base">カタカナ</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={useHiragana}
+                    onChange={() => setUseHiragana(true)}
+                    className="w-5 h-5"
+                  />
+                  <span className="text-base">ひらがな</span>
+                </label>
+              </div>
+              
+              {/* チェックボックス */}
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer py-1">
+                  <input
+                    type="checkbox"
+                    checked={useBatchimRomaji}
+                    onChange={(e) => setUseBatchimRomaji(e.target.checked)}
+                    className="w-5 h-5"
+                  />
+                  <span className="text-base">パッチムをローマ字表示</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer py-1">
+                  <input
+                    type="checkbox"
+                    checked={highlightRieul}
+                    onChange={(e) => setHighlightRieul(e.target.checked)}
+                    className="w-5 h-5"
+                  />
+                  <span className="text-base">リウルハイライト</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer py-1">
+                  <input
+                    type="checkbox"
+                    checked={highlightEu}
+                    onChange={(e) => setHighlightEu(e.target.checked)}
+                    className="w-5 h-5"
+                  />
+                  <span className="text-base">ㅡ(ウ)母音の枠線</span>
+                </label>
+              </div>
             </div>
-            
-            <div className="flex gap-4">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={useBatchimRomaji}
-                  onChange={(e) => setUseBatchimRomaji(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <span>パッチムをローマ字表示</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={highlightRieul}
-                  onChange={(e) => setHighlightRieul(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <span>リウルハイライト</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={highlightEu}
-                  onChange={(e) => setHighlightEu(e.target.checked)}
-                  className="w-4 h-4"
-                />
-                <span>ㅡ(ウ)母音の枠線</span>
-              </label>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 mb-4">
@@ -691,7 +723,7 @@ export default function KoreanLyricsRuby() {
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="テスト用:&#10;면 → ミョン&#10;겼어 → キョッソ&#10;좋아 → チョア&#10;들 → ドゥル(リウルハイライト確認)"
+            placeholder="テスト用:&#10;면 → ミョン&#10;겼어 → キョッソ&#10;좋아 → チョア&#10;들 → ドゥル（リウルハイライト確認）"
             className="w-full h-40 p-3 border border-gray-300 rounded-md font-mono"
           />
           
@@ -793,8 +825,8 @@ export default function KoreanLyricsRuby() {
               <div className="text-xs text-blue-800 space-y-1">
                 <p>• 文字を<strong>クリック/タップ</strong>で黄色マーク、<strong>ドラッグ</strong>で複数選択</p>
                 <p>• <strong>ダブルクリック/長押し</strong>で発音を自由に編集できます ✏️</p>
-                <p>• <span className="inline-block px-2 py-0.5 mx-1" style={{background: 'linear-gradient(to bottom, transparent 50%, #bbf7d0 50%)'}}>緑の背景</span>=パッチムㄹ(リウル)の発音</p>
-                <p>• <span className="inline-block px-2 py-0.5 mx-1" style={{border: '2px solid #fb923c', borderRadius: '4px'}}>オレンジ枠</span>=ㅡ(ウ)母音(口を横に開く😁特殊な発音)</p>
+                <p>• <span className="inline-block px-2 py-0.5 mx-1" style={{background: 'linear-gradient(to bottom, transparent 50%, #bbf7d0 50%)'}}>緑の背景</span>＝パッチムㄹ（リウル）の発音</p>
+                <p>• <span className="inline-block px-2 py-0.5 mx-1" style={{border: '2px solid #fb923c', borderRadius: '4px'}}>オレンジ枠</span>＝ㅡ(ウ)母音（口を横に開く😁特殊な発音）</p>
               </div>
             </div>
           </div>
@@ -833,7 +865,7 @@ export default function KoreanLyricsRuby() {
                   value={editBatchim}
                   onChange={(e) => setEditBatchim(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="カタカナで入力(なければ空欄)"
+                  placeholder="カタカナで入力（なければ空欄）"
                 />
               </div>
 
@@ -905,6 +937,17 @@ export default function KoreanLyricsRuby() {
           )}
         </div>
       </div>
+
+  {/* トップに戻るボタン */}
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className={`fixed bottom-6 right-6 lg:right-[calc((100vw-56rem)/2-4rem)] bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-700 z-50 transition-opacity duration-300 ${
+          showScrollTop ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        title="トップに戻る"
+      >
+        ↑
+      </button>
     </div>
   );
 }
