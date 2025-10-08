@@ -102,33 +102,7 @@ const VOICED_KANA: { [key: string]: string } = {
   'キョ': 'ギョ', 'ショ': 'ジョ', 'ヒョ': 'ビョ'
 };
 
-interface ConvertedChar {
-  original: string;
-  ruby?: string;
-  mainSound?: string;
-  batchimSound?: string;
-  hasBatchim?: boolean;
-  highlighted?: boolean;
-  isNewline?: boolean;
-  isSpace?: boolean;
-  isCustomEdited?: boolean;
-  decomposed?: {
-    cho: string;
-    jung: string;
-    jong: string;
-  };
-  cho?: string;
-  jung?: string;
-  jong?: string;
-}
 
-interface SavedLyric {
-  id: number;
-  title: string;
-  input: string;
-  converted: ConvertedChar[];
-  date: string;
-}
 
 function decomposeHangul(char: string) {
   const code = char.charCodeAt(0) - 0xAC00;
