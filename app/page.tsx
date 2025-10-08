@@ -1,6 +1,5 @@
-// app/page.tsx
+// ファイルパス: app/page.tsx
 'use client';
-
 import React, { useState, useEffect } from 'react';
 import { Download, Upload, Save, Trash2, Clipboard } from 'lucide-react';
 
@@ -9,21 +8,21 @@ const CHOSUNG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 
 const JUNGSUNG = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
 const JONGSUNG = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
 
-const CHOSUNG_KATAKANA = {
+const CHOSUNG_KATAKANA: { [key: string]: string } = {
   'ㄱ': 'k', 'ㄲ': 'kk', 'ㄴ': 'n', 'ㄷ': 't', 'ㄸ': 'tt',
   'ㄹ': 'r', 'ㅁ': 'm', 'ㅂ': 'p', 'ㅃ': 'pp', 'ㅅ': 's',
   'ㅆ': 'ss', 'ㅇ': '', 'ㅈ': 'ch', 'ㅉ': 'jj', 'ㅊ': 'ch',
   'ㅋ': 'k', 'ㅌ': 't', 'ㅍ': 'p', 'ㅎ': 'h'
 };
 
-const JUNGSUNG_KATAKANA = {
+const JUNGSUNG_KATAKANA: { [key: string]: string } = {
   'ㅏ': 'a', 'ㅐ': 'e', 'ㅑ': 'ya', 'ㅒ': 'ye', 'ㅓ': 'eo',
   'ㅔ': 'e', 'ㅕ': 'yeo', 'ㅖ': 'ye', 'ㅗ': 'o', 'ㅘ': 'wa',
   'ㅙ': 'we', 'ㅚ': 'we', 'ㅛ': 'yo', 'ㅜ': 'u', 'ㅝ': 'wo',
   'ㅞ': 'we', 'ㅟ': 'wi', 'ㅠ': 'yu', 'ㅡ': 'eu', 'ㅢ': 'ui', 'ㅣ': 'i'
 };
 
-const JONGSUNG_KATAKANA = {
+const JONGSUNG_KATAKANA: { [key: string]: string } = {
   '': '', 'ㄱ': 'k', 'ㄲ': 'k', 'ㄳ': 'k', 'ㄴ': 'n',
   'ㄵ': 'n', 'ㄶ': 'n', 'ㄷ': 't', 'ㄹ': 'r', 'ㄺ': 'k',
   'ㄻ': 'm', 'ㄼ': 'r', 'ㄽ': 'r', 'ㄾ': 'r', 'ㄿ': 'p',
@@ -33,21 +32,21 @@ const JONGSUNG_KATAKANA = {
 };
 
 const TENSIFICATION_INITIALS = ['ㄱ', 'ㄷ', 'ㅂ', 'ㅅ', 'ㅈ'];
-const TENSIFICATION_MAP = {
+const TENSIFICATION_MAP: { [key: string]: string } = {
   'ㄱ': 'ㄲ', 'ㄷ': 'ㄸ', 'ㅂ': 'ㅃ', 'ㅅ': 'ㅆ', 'ㅈ': 'ㅉ'
 };
 
-const ASPIRATION_MAP = {
+const ASPIRATION_MAP: { [key: string]: string } = {
   'ㄱㅎ': 'ㅋ', 'ㄷㅎ': 'ㅌ', 'ㅂㅎ': 'ㅍ', 'ㅈㅎ': 'ㅊ',
   'ㅎㄱ': 'ㅋ', 'ㅎㄷ': 'ㅌ', 'ㅎㅂ': 'ㅍ', 'ㅎㅈ': 'ㅊ'
 };
 
-const DOUBLE_JONGSUNG_LIAISON = {
+const DOUBLE_JONGSUNG_LIAISON: { [key: string]: string } = {
   'ㄳ': 'ㄱ', 'ㄵ': 'ㄴ', 'ㄶ': 'ㄴ', 'ㄺ': 'ㄱ', 'ㄻ': 'ㅁ',
   'ㄼ': 'ㄹ', 'ㄽ': 'ㄹ', 'ㄾ': 'ㄹ', 'ㄿ': 'ㅂ', 'ㅀ': 'ㄹ', 'ㅄ': 'ㅂ'
 };
 
-const CONSONANT_TO_KANA = {
+const CONSONANT_TO_KANA: { [key: string]: string[] } = {
   '': ['', 'ア', 'イ', 'ウ', 'エ', 'オ'],
   'k': ['k', 'カ', 'キ', 'ク', 'ケ', 'コ'],
   'kk': ['kk', 'ッカ', 'ッキ', 'ック', 'ッケ', 'ッコ'],
@@ -65,13 +64,13 @@ const CONSONANT_TO_KANA = {
   'h': ['h', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ']
 };
 
-const VOWEL_TO_INDEX = {
+const VOWEL_TO_INDEX: { [key: string]: number } = {
   'a': 1, 'ya': 1, 'i': 2, 'u': 3, 'yu': 3, 'e': 4, 'ye': 4,
   'o': 5, 'yo': 5, 'eo': 5, 'eu': 3, 'ae': 4,
   'oe': 4, 'we': 4, 'wi': 2, 'wa': 1, 'wo': 5, 'ui': 2, 'yeo': 5
 };
 
-const SPECIAL_COMBINATIONS = {
+const SPECIAL_COMBINATIONS: { [key: string]: string } = {
   'nya': 'ニャ', 'nyu': 'ニュ', 'nyo': 'ニョ', 'nye': 'ニェ',
   'rya': 'リャ', 'ryu': 'リュ', 'ryo': 'リョ', 'rye': 'リェ',
   'mya': 'ミャ', 'myu': 'ミュ', 'myo': 'ミョ', 'mye': 'ミェ',
@@ -93,7 +92,7 @@ const SPECIAL_COMBINATIONS = {
   'ng': 'ン', 'n': 'ン', 'r': 'ル', 'm': 'ム', 'k': 'ク', 't': 'ッ', 'p': 'プ'
 };
 
-const VOICED_KANA = {
+const VOICED_KANA: { [key: string]: string } = {
   'カ': 'ガ', 'キ': 'ギ', 'ク': 'グ', 'ケ': 'ゲ', 'コ': 'ゴ',
   'タ': 'ダ', 'チ': 'ジ', 'ツ': 'ヅ', 'トゥ': 'ドゥ', 'テ': 'デ', 'ト': 'ド',
   'パ': 'バ', 'ピ': 'ビ', 'プ': 'ブ', 'ペ': 'ベ', 'ポ': 'ボ',
@@ -101,6 +100,34 @@ const VOICED_KANA = {
   'ポァ': 'ボァ', 'クァ': 'グァ', 'トァ': 'ドァ',
   'キョ': 'ギョ', 'ショ': 'ジョ', 'ヒョ': 'ビョ'
 };
+
+interface ConvertedChar {
+  original: string;
+  ruby?: string;
+  mainSound?: string;
+  batchimSound?: string;
+  hasBatchim?: boolean;
+  highlighted?: boolean;
+  isNewline?: boolean;
+  isSpace?: boolean;
+  isCustomEdited?: boolean;
+  decomposed?: {
+    cho: string;
+    jung: string;
+    jong: string;
+  };
+  cho?: string;
+  jung?: string;
+  jong?: string;
+}
+
+interface SavedLyric {
+  id: number;
+  title: string;
+  input: string;
+  converted: ConvertedChar[];
+  date: string;
+}
 
 function decomposeHangul(char: string) {
   const code = char.charCodeAt(0) - 0xAC00;
@@ -126,7 +153,7 @@ function romanToKatakana(roman: string): string {
   
   const consonants = ['kkyeo', 'ttyeo', 'ppyeo', 'ssyeo', 'jjyeo', 'kyeo', 'nyeo', 'tyeo', 'ryeo', 'myeo', 'pyeo', 'syeo', 'chyeo', 'hyeo', 'kk', 'tt', 'pp', 'ss', 'jj', 'ch', 'k', 't', 'r', 'p', 's', 'n', 'm', 'h', ''];
   
-  for (let consonant of consonants) {
+  for (const consonant of consonants) {
     if (roman.startsWith(consonant)) {
       const remainingVowel = roman.substring(consonant.length);
       const vowelIndex = VOWEL_TO_INDEX[remainingVowel];
@@ -159,7 +186,7 @@ function applyVoicing(kana: string): string {
   return result;
 }
 
-function applyPronunciationRules(chars: any[]): any[] {
+function applyPronunciationRules(chars: ConvertedChar[]): ConvertedChar[] {
   const syllables = chars.map(char => {
     if (char.decomposed) {
       return {
@@ -207,31 +234,31 @@ function applyPronunciationRules(chars: any[]): any[] {
       }
     }
     
-    if (['ㄴ', 'ㅁ', 'ㅇ', 'ㄹ'].includes(current.jong) && nextAcrossAll && nextAcrossAll.cho === 'ㅎ') {
-      nextAcrossAll.cho = current.jong;
+    if (['ㄴ', 'ㅁ', 'ㅇ', 'ㄹ'].includes(current.jong || '') && nextAcrossAll && nextAcrossAll.cho === 'ㅎ') {
+      nextAcrossAll.cho = current.jong || '';
       current.jong = '';
     }
     
     else if (nextStrict) {
       const next = nextStrict;
       
-      if (['ㄷ', 'ㅌ'].includes(current.jong) && next.jung === 'ㅣ') {
+      if (['ㄷ', 'ㅌ'].includes(current.jong || '') && next.jung === 'ㅣ') {
         if (current.jong === 'ㄷ') next.cho = 'ㅈ';
         if (current.jong === 'ㅌ') next.cho = 'ㅊ';
         current.jong = '';
       }
       
-      else if (['ㄴ', 'ㅁ', 'ㅇ'].includes(current.jong) && 
+      else if (['ㄴ', 'ㅁ', 'ㅇ'].includes(current.jong || '') && 
                 next.cho === 'ㅇ' && 
-                ['ㅑ', 'ㅕ', 'ㅛ', 'ㅠ'].includes(next.jung)) {
+                ['ㅑ', 'ㅕ', 'ㅛ', 'ㅠ'].includes(next.jung || '')) {
         next.cho = 'ㄴ';
       }
       
-      else if (current.jong === 'ㅎ' && ['ㄱ', 'ㄷ', 'ㅂ', 'ㅈ'].includes(next.cho)) {
+      else if (current.jong === 'ㅎ' && ['ㄱ', 'ㄷ', 'ㅂ', 'ㅈ'].includes(next.cho || '')) {
         next.cho = ASPIRATION_MAP[current.jong + next.cho];
         current.jong = '';
       }
-      else if (['ㄱ', 'ㄷ', 'ㅂ', 'ㅈ'].includes(current.jong) && next.cho === 'ㅎ') {
+      else if (['ㄱ', 'ㄷ', 'ㅂ', 'ㅈ'].includes(current.jong || '') && next.cho === 'ㅎ') {
         next.cho = ASPIRATION_MAP[current.jong + next.cho];
         current.jong = '';
       }
@@ -246,36 +273,36 @@ function applyPronunciationRules(chars: any[]): any[] {
         current.jong = '';
       }
       
-      else if (['ㄱ', 'ㄷ', 'ㅂ', 'ㄲ', 'ㅆ'].includes(current.jong) && TENSIFICATION_INITIALS.includes(next.cho)) {
-        if (TENSIFICATION_MAP[next.cho]) {
+      else if (['ㄱ', 'ㄷ', 'ㅂ', 'ㄲ', 'ㅆ'].includes(current.jong || '') && TENSIFICATION_INITIALS.includes(next.cho || '')) {
+        if (next.cho && TENSIFICATION_MAP[next.cho]) {
           next.cho = TENSIFICATION_MAP[next.cho];
         }
       }
       
-      else if (['ㄱ', 'ㄷ', 'ㅂ'].includes(current.jong) && ['ㄴ', 'ㅁ'].includes(next.cho)) {
-        const nasalizationMap: any = {
+      else if (['ㄱ', 'ㄷ', 'ㅂ'].includes(current.jong || '') && ['ㄴ', 'ㅁ'].includes(next.cho || '')) {
+        const nasalizationMap: { [key: string]: string } = {
           'ㄱ': 'ㅇ',
           'ㄷ': 'ㄴ',
           'ㅂ': 'ㅁ'
         };
-        current.jong = nasalizationMap[current.jong];
+        current.jong = nasalizationMap[current.jong || ''];
       }
       
-      else if (['ㅅ', 'ㅆ', 'ㅈ', 'ㅊ', 'ㅌ'].includes(current.jong) && ['ㄴ', 'ㅁ'].includes(next.cho)) {
+      else if (['ㅅ', 'ㅆ', 'ㅈ', 'ㅊ', 'ㅌ'].includes(current.jong || '') && ['ㄴ', 'ㅁ'].includes(next.cho || '')) {
         current.jong = 'ㄴ';
       }
       
-      else if (current.jong === 'ㄹ' && ['ㄴ', 'ㅁ'].includes(next.cho)) {
+      else if (current.jong === 'ㄹ' && ['ㄴ', 'ㅁ'].includes(next.cho || '')) {
         current.jong = next.cho;
       }
     }
   }
   
-  const result = [];
+  const result: ConvertedChar[] = [];
   for (let i = 0; i < syllables.length; i++) {
     const current = syllables[i];
     
-    let prevElement = i > 0 ? syllables[i - 1] : null;
+    const prevElement = i > 0 ? syllables[i - 1] : null;
     
     let prevHangul = null;
     for (let j = i - 1; j >= 0; j--) {
@@ -316,7 +343,7 @@ function applyPronunciationRules(chars: any[]): any[] {
       }
     }
     
-    const choJungRoman = (CHOSUNG_KATAKANA[cho] || '') + (JUNGSUNG_KATAKANA[jung] || '');
+    const choJungRoman = (CHOSUNG_KATAKANA[cho] || '') + (JUNGSUNG_KATAKANA[jung || ''] || '');
     const jongRoman = jong ? (JONGSUNG_KATAKANA[jong] || '') : '';
     
     let mainSound = romanToKatakana(choJungRoman) || choJungRoman;
@@ -331,19 +358,19 @@ function applyPronunciationRules(chars: any[]): any[] {
       ruby: mainSound + batchimSound,
       mainSound: mainSound,
       batchimSound: batchimSound,
-      hasBatchim: hasBatchim && batchimSound,
+   hasBatchim: Boolean(hasBatchim && batchimSound),
       highlighted: false,
-      decomposed: { cho, jung, jong }
+      decomposed: { cho, jung: jung || '', jong: jong || '' }
     });
   }
   
   return result;
 }
 
-function convertToKatakana(text: string): any[] {
-  let chars = [];
+function convertToKatakana(text: string): ConvertedChar[] {
+  const chars: ConvertedChar[] = [];
   
-  for (let char of text) {
+  for (const char of text) {
     if (char.match(/[가-힣]/)) {
       const decomposed = decomposeHangul(char);
       if (decomposed) {
@@ -369,12 +396,12 @@ function katakanaToHiragana(text: string): string {
 
 export default function KoreanLyricsRuby() {
   const [input, setInput] = useState('');
-  const [converted, setConverted] = useState<any[]>([]);
+  const [converted, setConverted] = useState<ConvertedChar[]>([]);
   const [useHiragana, setUseHiragana] = useState(false);
   const [useBatchimRomaji, setUseBatchimRomaji] = useState(false);
   const [highlightRieul, setHighlightRieul] = useState(true);
   const [highlightEu, setHighlightEu] = useState(true);
-  const [savedLyrics, setSavedLyrics] = useState<any[]>([]);
+  const [savedLyrics, setSavedLyrics] = useState<SavedLyric[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -395,12 +422,12 @@ export default function KoreanLyricsRuby() {
   };
 
   const handleSave = () => {
-    const title = prompt('タイトルを入力してください（例：Spring Day - BTS）');
+    const title = prompt('タイトルを入力してください(例:Spring Day - BTS)');
     if (!title || !title.trim()) {
       return;
     }
     
-    const newLyric = {
+    const newLyric: SavedLyric = {
       id: Date.now(),
       title: title.trim(),
       input: input,
@@ -411,22 +438,23 @@ export default function KoreanLyricsRuby() {
     const updated = [...savedLyrics, newLyric];
     setSavedLyrics(updated);
     localStorage.setItem('koreanLyrics', JSON.stringify(updated));
-    alert('保存しました！');
+    alert('保存しました!');
   };
 
-  const handleLoad = (lyric: any) => {
+  const handleLoad = (lyric: SavedLyric) => {
     setInput(lyric.input);
     setConverted(lyric.converted);
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('削除しますか？')) {
+    if (confirm('削除しますか?')) {
       const updated = savedLyrics.filter(l => l.id !== id);
       setSavedLyrics(updated);
       localStorage.setItem('koreanLyrics', JSON.stringify(updated));
     }
   };
-const handleExportSingle = (lyric: any) => {
+
+  const handleExportSingle = (lyric: SavedLyric) => {
     const safeTitle = lyric.title.replace(/[/:*?"<>|]/g, '-');
     const dataStr = JSON.stringify([lyric], null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -436,6 +464,7 @@ const handleExportSingle = (lyric: any) => {
     link.download = `${safeTitle}.json`;
     link.click();
   };
+
   const handleExport = () => {
     const dataStr = JSON.stringify(savedLyrics, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -455,8 +484,8 @@ const handleExportSingle = (lyric: any) => {
           const imported = JSON.parse(event.target?.result as string);
           setSavedLyrics(imported);
           localStorage.setItem('koreanLyrics', JSON.stringify(imported));
-          alert('インポートしました！');
-        } catch (error) {
+          alert('インポートしました!');
+        } catch {
           alert('ファイルの読み込みに失敗しました');
         }
       };
@@ -468,7 +497,7 @@ const handleExportSingle = (lyric: any) => {
     try {
       const text = await navigator.clipboard.readText();
       setInput(text);
-    } catch (err) {
+    } catch {
       alert('ペーストするには Ctrl+V (Mac: Cmd+V) を押してください');
     }
   };
@@ -548,7 +577,7 @@ const handleExportSingle = (lyric: any) => {
     }
   };
 
-  const displayText = (char: any) => {
+  const displayText = (char: ConvertedChar) => {
     const mainText = useHiragana && char.mainSound ? katakanaToHiragana(char.mainSound) : char.mainSound;
     let batchimText = char.batchimSound;
     
@@ -561,7 +590,7 @@ const handleExportSingle = (lyric: any) => {
     return { mainText, batchimText };
   };
 
-  const getBackgroundColor = (char: any) => {
+  const getBackgroundColor = (char: ConvertedChar) => {
     if (char.highlighted) return '#fef08a';
     
     if (highlightRieul && char.decomposed?.jong === 'ㄹ') {
@@ -571,7 +600,7 @@ const handleExportSingle = (lyric: any) => {
     return 'transparent';
   };
 
-  const getBorderStyle = (char: any) => {
+  const getBorderStyle = (char: ConvertedChar) => {
     if (highlightEu && char.decomposed?.jung === 'ㅡ') {
       return '2px solid #fb923c';
     }
@@ -588,7 +617,7 @@ const handleExportSingle = (lyric: any) => {
           ハングルにカタカナ/ひらがなのルビを自動で付けます
         </p>
         <p className="text-center text-purple-600 mb-4 text-xs font-medium">
-          🚀 Next.js版（면→ミョン、겼어→キョッソ、좋아→チョア）
+          🚀 Next.js版(면→ミョン、겼어→キョッソ、좋아→チョア)
         </p>
 
         <div className="bg-white rounded-lg shadow-md p-4 mb-4 sticky top-0 z-50">
@@ -662,7 +691,7 @@ const handleExportSingle = (lyric: any) => {
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="테스트용：&#10;면 → ミョン&#10;겼어 → キョッソ&#10;좋아 → チョア&#10;들 → ドゥル（リウルハイライト確認）"
+            placeholder="テスト用:&#10;면 → ミョン&#10;겼어 → キョッソ&#10;좋아 → チョア&#10;들 → ドゥル(リウルハイライト確認)"
             className="w-full h-40 p-3 border border-gray-300 rounded-md font-mono"
           />
           
@@ -764,8 +793,8 @@ const handleExportSingle = (lyric: any) => {
               <div className="text-xs text-blue-800 space-y-1">
                 <p>• 文字を<strong>クリック/タップ</strong>で黄色マーク、<strong>ドラッグ</strong>で複数選択</p>
                 <p>• <strong>ダブルクリック/長押し</strong>で発音を自由に編集できます ✏️</p>
-                <p>• <span className="inline-block px-2 py-0.5 mx-1" style={{background: 'linear-gradient(to bottom, transparent 50%, #bbf7d0 50%)'}}>緑の背景</span>＝パッチムㄹ（リウル）の発音</p>
-                <p>• <span className="inline-block px-2 py-0.5 mx-1" style={{border: '2px solid #fb923c', borderRadius: '4px'}}>オレンジ枠</span>＝ㅡ(ウ)母音（口を横に開く😁特殊な発音）</p>
+                <p>• <span className="inline-block px-2 py-0.5 mx-1" style={{background: 'linear-gradient(to bottom, transparent 50%, #bbf7d0 50%)'}}>緑の背景</span>=パッチムㄹ(リウル)の発音</p>
+                <p>• <span className="inline-block px-2 py-0.5 mx-1" style={{border: '2px solid #fb923c', borderRadius: '4px'}}>オレンジ枠</span>=ㅡ(ウ)母音(口を横に開く😁特殊な発音)</p>
               </div>
             </div>
           </div>
@@ -804,7 +833,7 @@ const handleExportSingle = (lyric: any) => {
                   value={editBatchim}
                   onChange={(e) => setEditBatchim(e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="カタカナで入力（なければ空欄）"
+                  placeholder="カタカナで入力(なければ空欄)"
                 />
               </div>
 
@@ -854,24 +883,24 @@ const handleExportSingle = (lyric: any) => {
             <p className="text-gray-500 text-center py-8">保存された歌詞はありません</p>
           ) : (
             <div className="space-y-2">
-          {savedLyrics.map((lyric) => (
-  <div key={lyric.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md hover:bg-gray-100">
-    <div className="flex-1 cursor-pointer" onClick={() => handleLoad(lyric)}>
-      <h3 className="font-medium text-gray-800">{lyric.title}</h3>
-      <p className="text-xs text-gray-500">
-        {new Date(lyric.date).toLocaleDateString('ja-JP')}
-      </p>
-    </div>
-    <div className="flex gap-2">
-      <button onClick={() => handleExportSingle(lyric)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-md" title="この曲をエクスポート">
-        <Download size={16} />
-      </button>
-      <button onClick={() => handleDelete(lyric.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-md">
-        <Trash2 size={16} />
-      </button>
-    </div>
-  </div>
-))}
+              {savedLyrics.map((lyric) => (
+                <div key={lyric.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-md hover:bg-gray-100">
+                  <div className="flex-1 cursor-pointer" onClick={() => handleLoad(lyric)}>
+                    <h3 className="font-medium text-gray-800">{lyric.title}</h3>
+                    <p className="text-xs text-gray-500">
+                      {new Date(lyric.date).toLocaleDateString('ja-JP')}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => handleExportSingle(lyric)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-md" title="この曲をエクスポート">
+                      <Download size={16} />
+                    </button>
+                    <button onClick={() => handleDelete(lyric.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-md">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
