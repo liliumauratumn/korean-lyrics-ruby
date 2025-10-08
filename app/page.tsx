@@ -2,6 +2,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Download, Upload, Save, Trash2, Clipboard } from 'lucide-react';
+import { getAllLyrics, saveLyric, deleteLyric, migrateFromLocalStorage } from '@/lib/indexedDB';
 
 // ハングル分解用の定数
 const CHOSUNG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
@@ -410,12 +411,17 @@ export default function KoreanLyricsRuby() {
   const [touchTimer, setTouchTimer] = useState<NodeJS.Timeout | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 const [showScrollTop, setShowScrollTop] = useState(false);
- useEffect(() => {
-    const saved = localStorage.getItem('koreanLyrics');
-    if (saved) {
-      setSavedLyrics(JSON.parse(saved));
-    }
-  }, []);
+useEffect(() => {
+  // LocalStorageからIndexedDBへの移行
+  migrateFromLocalStorage().then(() => {
+    // IndexedDBから全データ読み込み
+    getAllLyrics().then((lyrics) => {
+      setSavedLyrics(lyrics);
+    }).catch((error) => {
+      console.error('データ読み込みエラー:', error);
+    });
+  });
+}, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -435,38 +441,48 @@ const [showScrollTop, setShowScrollTop] = useState(false);
     setConverted(result);
   };
 
-  const handleSave = () => {
-    const title = prompt('タイトルを入力してください（例：Spring Day - BTS）');
-    if (!title || !title.trim()) {
-      return;
-    }
-    
-    const newLyric: SavedLyric = {
-      id: Date.now(),
-      title: title.trim(),
-      input: input,
-      converted: converted,
-      date: new Date().toISOString()
-    };
-    
+  const handleSave = async () => {
+  const title = prompt('タイトルを入力してください（例：Spring Day - BTS）');
+  if (!title || !title.trim()) {
+    return;
+  }
+  
+  const newLyric = {
+    id: Date.now(),
+    title: title.trim(),
+    input: input,
+    converted: converted,
+    date: new Date().toISOString()
+  };
+  
+  try {
+    await saveLyric(newLyric);
     const updated = [...savedLyrics, newLyric];
     setSavedLyrics(updated);
-    localStorage.setItem('koreanLyrics', JSON.stringify(updated));
     alert('保存しました！');
-  };
+  } catch (error) {
+    console.error('保存エラー:', error);
+    alert('保存に失敗しました');
+  }
+};
 
   const handleLoad = (lyric: SavedLyric) => {
     setInput(lyric.input);
     setConverted(lyric.converted);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm('削除しますか？')) {
+const handleDelete = async (id: number) => {
+  if (confirm('削除しますか？')) {
+    try {
+      await deleteLyric(id);
       const updated = savedLyrics.filter(l => l.id !== id);
       setSavedLyrics(updated);
-      localStorage.setItem('koreanLyrics', JSON.stringify(updated));
+    } catch (error) {
+      console.error('削除エラー:', error);
+      alert('削除に失敗しました');
     }
-  };
+  }
+};
 
   const handleExportSingle = (lyric: SavedLyric) => {
     const safeTitle = lyric.title.replace(/[/:*?"<>|]/g, '-');
@@ -489,28 +505,32 @@ const [showScrollTop, setShowScrollTop] = useState(false);
     link.click();
   };
 
-const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const imported = JSON.parse(event.target?.result as string) as SavedLyric[];
+const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const imported = JSON.parse(event.target?.result as string);
+        const existingIds = new Set(savedLyrics.map(l => l.id));
+        const newLyrics = imported.filter((lyric: any) => !existingIds.has(lyric.id));
+        
+        if (newLyrics.length > 0) {
+          // IndexedDBに保存
+          for (const lyric of newLyrics) {
+            await saveLyric(lyric);
+          }
           
-          // 既存データと結合（重複チェック）
-          const existingIds = new Set(savedLyrics.map(l => l.id));
-          const newLyrics = imported.filter(lyric => !existingIds.has(lyric.id));
-          const merged = [...savedLyrics, ...newLyrics];
-          
-          setSavedLyrics(merged);
-          localStorage.setItem('koreanLyrics', JSON.stringify(merged));
-        } catch {
-          alert('ファイルの読み込みに失敗しました');
+          const updated = [...savedLyrics, ...newLyrics];
+          setSavedLyrics(updated);
         }
-      };
-      reader.readAsText(file);
-    }
-  };
+      } catch (error) {
+        alert('ファイルの読み込みに失敗しました');
+      }
+    };
+    reader.readAsText(file);
+  }
+};
 
   const handlePaste = async () => {
     try {
