@@ -17,11 +17,11 @@ export interface SavedLyric {
 // ⭐ ConvertedChar型を追加
 export interface ConvertedChar {
   original: string;
-  ruby: string;
-  mainSound: string;
-  batchimSound: string;
-  hasBatchim: boolean;
-  highlighted: boolean;
+  ruby?: string;
+  mainSound?: string;
+  batchimSound?: string;
+  hasBatchim?: boolean;
+  highlighted?: boolean;
   decomposed?: {
     cho: string;
     jung: string;
@@ -30,6 +30,9 @@ export interface ConvertedChar {
   isNewline?: boolean;
   isSpace?: boolean;
   isCustomEdited?: boolean;
+  cho?: string;   // ⭐ 追加
+  jung?: string;  // ⭐ 追加
+  jong?: string;  // ⭐ 追加
 }
 
 // IndexedDBが使えるかチェック
