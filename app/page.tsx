@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Download, Upload, Save, Trash2, Clipboard } from 'lucide-react';
-import { getAllLyrics, saveLyric, deleteLyric, migrateFromLocalStorage } from '@/lib/indexedDB';
+import { getAllLyrics, saveLyric, deleteLyric, migrateFromLocalStorage, SavedLyric, ConvertedChar } from '@/lib/indexedDB';
 
 // ハングル分解用の定数
 const CHOSUNG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
@@ -511,10 +511,10 @@ const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const reader = new FileReader();
     reader.onload = async (event) => {
       try {
-        const imported = JSON.parse(event.target?.result as string);
-        const existingIds = new Set(savedLyrics.map(l => l.id));
-        const newLyrics = imported.filter((lyric: any) => !existingIds.has(lyric.id));
-        
+    const imported: SavedLyric[] = JSON.parse(event.target?.result as string);
+const existingIds = new Set(savedLyrics.map(l => l.id));
+const newLyrics = imported.filter((lyric) => !existingIds.has(lyric.id));
+
         if (newLyrics.length > 0) {
           // IndexedDBに保存
           for (const lyric of newLyrics) {
@@ -524,9 +524,9 @@ const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
           const updated = [...savedLyrics, ...newLyrics];
           setSavedLyrics(updated);
         }
-      } catch (error) {
-        alert('ファイルの読み込みに失敗しました');
-      }
+  } catch {
+  alert('ファイルの読み込みに失敗しました');
+}
     };
     reader.readAsText(file);
   }
