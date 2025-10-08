@@ -489,16 +489,21 @@ const [showScrollTop, setShowScrollTop] = useState(false);
     link.click();
   };
 
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
         try {
-          const imported = JSON.parse(event.target?.result as string);
-          setSavedLyrics(imported);
-          localStorage.setItem('koreanLyrics', JSON.stringify(imported));
-          alert('インポートしました！');
+          const imported = JSON.parse(event.target?.result as string) as SavedLyric[];
+          
+          // 既存データと結合（重複チェック）
+          const existingIds = new Set(savedLyrics.map(l => l.id));
+          const newLyrics = imported.filter(lyric => !existingIds.has(lyric.id));
+          const merged = [...savedLyrics, ...newLyrics];
+          
+          setSavedLyrics(merged);
+          localStorage.setItem('koreanLyrics', JSON.stringify(merged));
         } catch {
           alert('ファイルの読み込みに失敗しました');
         }
