@@ -2,8 +2,35 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Download, Upload, Save, Trash2, Clipboard } from 'lucide-react';
-import { getAllLyrics, saveLyric, deleteLyric, migrateFromLocalStorage, SavedLyric, ConvertedChar } from '@/lib/indexedDB';
+import { getAllLyrics, saveLyric, deleteLyric, migrateFromLocalStorage } from '@/lib/indexedDB';
+// ⭐ ここに型定義を追加
+export interface ConvertedChar {
+  original: string;
+  ruby?: string;
+  mainSound?: string;
+  batchimSound?: string;
+  hasBatchim?: boolean;
+  highlighted?: boolean;
+  decomposed?: {
+    cho: string;
+    jung: string;
+    jong: string;
+  };
+  isNewline?: boolean;
+  isSpace?: boolean;
+  isCustomEdited?: boolean;
+  cho?: string;
+  jung?: string;
+  jong?: string;
+}
 
+export interface SavedLyric {
+  id: number;
+  title: string;
+  input: string;
+  converted: ConvertedChar[];
+  date: string;
+}
 // ハングル分解用の定数
 const CHOSUNG = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
 const JUNGSUNG = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
